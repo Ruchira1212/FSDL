@@ -1,2 +1,5 @@
 Assignment - 02
-Design and develop a responsive web page (for example, student registration, course enrollment, library management system, online shopping system, etc.) using the Bootstrap front-end framework. Web pages should contain HTML5 elements (Use all possible formatting for example, font, colour, etc.).
+
+
+Design and develop a responsive web page (for example, student registration, course enrollment, library management system, online shopping system, etc.) 
+using the Bootstrap front-end framework. Web pages should contain HTML5 elements (Use all possible formatting for example, font, colour, etc.).
