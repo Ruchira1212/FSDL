@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 740px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 8px;
+            padding: 32px 24px;
+            margin-bottom: 12px;
+            border-top: 10px solid #673ab7;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 400;
+            color: #202124;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #5f6368;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .required-note {
+            color: #d93025;
+            font-size: 14px;
+            margin-top: 24px;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #202124;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        .required {
+            color: #d93025;
+            margin-left: 4px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 14px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: white;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #673ab7;
+            box-shadow: 0 1px 1px 0 rgba(103, 58, 183, 0.1), 0 1px 3px 1px rgba(103, 58, 183, 0.15);
+        }
+
+        input.error,
+        select.error,
+        textarea.error {
+            border-color: #d93025;
+            background-color: #fce8e6;
+        }
+
+        input.error:focus,
+        select.error:focus,
+        textarea.error:focus {
+            border-color: #d93025;
+            box-shadow: 0 1px 1px 0 rgba(217, 48, 37, 0.1), 0 1px 3px 1px rgba(217, 48, 37, 0.15);
+            background-color: #fff;
+        }
+
+        .error-message {
+            color: #d93025;
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+            line-height: 1.4;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .radio-group,
+        .checkbox-group {
+            margin-top: 8px;
+        }
+
+        .radio-option,
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"],
+        .checkbox-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #673ab7;
+        }
+
+        .radio-option label,
+        .checkbox-option label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: #5f6368;
+            margin-top: 4px;
+        }
+
+        .form-actions {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        button {
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-submit {
+            background: #673ab7;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #5e35b1;
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+        }
+
+        .btn-submit:disabled {
+            background: #dadce0;
+            color: #80868b;
+            cursor: not-allowed;
+        }
+
+        .btn-clear {
+            background: white;
+            color: #673ab7;
+            border: 1px solid #dadce0;
+        }
+
+        .btn-clear:hover {
+            background: #f8f9fa;
+        }
+
+        .success-message {
+            background: white;
+            border-radius: 8px;
+            padding: 48px 24px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-message h2 {
+            color: #1e8e3e;
+            font-size: 24px;
+            margin-bottom: 12px;
+            font-weight: 400;
+        }
+
+        .success-message p {
+            color: #5f6368;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #5f6368;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 640px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .form-section,
+            .header,
+            .form-actions {
+                padding: 16px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Student Registration Form</h1>
+            <p>Please fill out this form to register as a student. All fields marked with an asterisk (*) are required.</p>
+            <p class="required-note">* Required</p>
+        </div>
+
+        <form id="registrationForm">
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h2 style="font-size: 18px; color: #202124; margin-bottom: 20px; font-weight: 400;">Personal Information</h2>
+                
+                <div class="form-group">
+                    <label for="firstName">First Name <span class="required">*</span></label>
+                    <input type="text" id="firstName" name="firstName" required>
+                    <div class="error-message" id="firstNameError">Please enter your first name</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName">Last Name <span class="required">*</span></label>
+                    <input type="text" id="lastName" name="lastName" required>
+                    <div class="error-message" id="lastNameError">Please enter your last name</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="error-message" id="emailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890" required>
+                    <div class="error-message" id="phoneError">Please enter a valid phone number</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dob">Date of Birth <span class="required">*</span></label>
+                    <input type="date" id="dob" name="dob" required>
+                    <div class="error-message" id="dobError">Please enter your date of birth</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="male" name="gender" value="male" required>
+                            <label for="male">Male</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="female" name="gender" value="female" required>
+                            <label for="female">Female</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="other" name="gender" value="other" required>
+                            <label for="other">Other</label>
+                        </div>
+                    </div>
+                    <div class="error-message" id="genderError">Please select your gender</div>
+                </div>
+            </div>
+
+            <!-- Academic Information -->
+            <div class="form-section">
+                <h2 style="font-size: 18px; color: #202124; margin-bottom: 20px; font-weight: 400;">Academic Information</h2>
+                
+                <div class="form-group">
+                    <label for="studentId">Student ID</label>
+                    <input type="text" id="studentId" name="studentId" placeholder="Leave blank if new student">
+                    <div class="helper-text">Enter your student ID if you're a returning student</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="grade">Grade Level <span class="required">*</span></label>
+                    <select id="grade" name="grade" required>
+                        <option value="">Select grade level</option>
+                        <option value="9">9th Grade</option>
+                        <option value="10">10th Grade</option>
+                        <option value="11">11th Grade</option>
+                        <option value="12">12th Grade</option>
+                        <option value="undergraduate">Undergraduate</option>
+                        <option value="graduate">Graduate</option>
+                    </select>
+                    <div class="error-message" id="gradeError">Please select a grade level</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="program">Program/Major <span class="required">*</span></label>
+                    <input type="text" id="program" name="program" required>
+                    <div class="error-message" id="programError">Please enter your program or major</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="gpa">Current GPA</label>
+                    <input type="number" id="gpa" name="gpa" min="0" max="4" step="0.01" placeholder="0.00 - 4.00">
+                    <div class="error-message" id="gpaError">Please enter a valid GPA (0.00 - 4.00)</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Extracurricular Activities</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="sports" name="activities" value="sports">
+                            <label for="sports">Sports</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="music" name="activities" value="music">
+                            <label for="music">Music/Arts</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="clubs" name="activities" value="clubs">
+                            <label for="clubs">Academic Clubs</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="volunteer" name="activities" value="volunteer">
+                            <label for="volunteer">Volunteer Work</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Information -->
+            <div class="form-section">
+                <h2 style="font-size: 18px; color: #202124; margin-bottom: 20px; font-weight: 400;">Address Information</h2>
+                
+                <div class="form-group">
+                    <label for="address">Street Address <span class="required">*</span></label>
+                    <input type="text" id="address" name="address" required>
+                    <div class="error-message" id="addressError">Please enter your street address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="city">City <span class="required">*</span></label>
+                    <input type="text" id="city" name="city" required>
+                    <div class="error-message" id="cityError">Please enter your city</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="state">State/Province <span class="required">*</span></label>
+                    <input type="text" id="state" name="state" required>
+                    <div class="error-message" id="stateError">Please enter your state or province</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="zipCode">ZIP/Postal Code <span class="required">*</span></label>
+                    <input type="text" id="zipCode" name="zipCode" required>
+                    <div class="error-message" id="zipCodeError">Please enter a valid ZIP or postal code</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="country">Country <span class="required">*</span></label>
+                    <select id="country" name="country" required>
+                        <option value="">Select country</option>
+                        <option value="USA">United States</option>
+                        <option value="Canada">Canada</option>
+                        <option value="UK">United Kingdom</option>
+                        <option value="Australia">Australia</option>
+                        <option value="India">India</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="error-message" id="countryError">Please select your country</div>
+                </div>
+            </div>
+
+            <!-- Emergency Contact -->
+            <div class="form-section">
+                <h2 style="font-size: 18px; color: #202124; margin-bottom: 20px; font-weight: 400;">Emergency Contact</h2>
+                
+                <div class="form-group">
+                    <label for="emergencyName">Contact Name <span class="required">*</span></label>
+                    <input type="text" id="emergencyName" name="emergencyName" required>
+                    <div class="error-message" id="emergencyNameError">Please enter emergency contact name</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyRelation">Relationship <span class="required">*</span></label>
+                    <input type="text" id="emergencyRelation" name="emergencyRelation" placeholder="e.g., Parent, Guardian, Spouse" required>
+                    <div class="error-message" id="emergencyRelationError">Please enter the relationship</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyPhone">Contact Phone <span class="required">*</span></label>
+                    <input type="tel" id="emergencyPhone" name="emergencyPhone" placeholder="(123) 456-7890" required>
+                    <div class="error-message" id="emergencyPhoneError">Please enter a valid phone number</div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="form-section">
+                <h2 style="font-size: 18px; color: #202124; margin-bottom: 20px; font-weight: 400;">Additional Information</h2>
+                
+                <div class="form-group">
+                    <label for="comments">Comments or Special Requirements</label>
+                    <textarea id="comments" name="comments" maxlength="500"></textarea>
+                    <div class="char-count"><span id="charCount">0</span> / 500</div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">I agree to the terms and conditions <span class="required">*</span></label>
+                    </div>
+                    <div class="error-message" id="termsError">You must agree to the terms and conditions</div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Submit Registration</button>
+                <button type="button" class="btn-clear" onclick="clearForm()">Clear Form</button>
+            </div>
+        </form>
+
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✓</div>
+            <h2>Registration Successful!</h2>
+            <p>Your student registration has been submitted successfully. You will receive a confirmation email shortly.</p>
+            <button type="button" class="btn-submit" onclick="submitAnother()">Submit Another Registration</button>
+        </div>
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="student-registration.js"></script>
+    
+    <!-- Inline script to ensure functions are available -->
+    <script>
+        // Ensure functions are available in global scope
+        window.addEventListener('load', function() {
+            console.log('Form loaded and ready');
+        });
+    </script>
+</body>
+</html>
