@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Registration System – CRUD</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --border: #2a2f3e;
+    --accent: #4ade80;
+    --accent2: #38bdf8;
+    --danger: #f87171;
+    --warn: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card: #1e2333;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  header .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  header .tagline {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-left: auto;
+    letter-spacing: 1px;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 0 40px;
+  }
+  .tab-btn {
+    padding: 14px 28px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+    top: 1px;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Sections ── */
+  .section { display: none; padding: 36px 40px; max-width: 900px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background: var(--accent2);
+    border-radius: 2px;
+  }
+
+  /* ── Form ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .form-grid .full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label {
+    font-size: 0.73rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  input[type="text"], input[type="password"], input[type="tel"], input[type="number"] {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: var(--accent2); }
+  input.error { border-color: var(--danger); }
+
+  .btn {
+    padding: 11px 28px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .btn-green { background: var(--accent); color: #000; }
+  .btn-green:hover { background: #22c55e; }
+  .btn-blue { background: var(--accent2); color: #000; }
+  .btn-blue:hover { background: #0ea5e9; }
+  .btn-red { background: var(--danger); color: #fff; }
+  .btn-red:hover { background: #ef4444; }
+  .btn-warn { background: var(--warn); color: #000; }
+  .btn-warn:hover { background: #f59e0b; }
+  .btn-ghost { background: var(--border); color: var(--text); }
+  .btn-ghost:hover { background: #374151; }
+
+  /* ── Alert ── */
+  .alert {
+    display: none;
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+  .alert.show { display: block; }
+  .alert-success { background: #052e16; border: 1px solid var(--accent); color: var(--accent); }
+  .alert-error   { background: #2d1515; border: 1px solid var(--danger); color: var(--danger); }
+  .alert-info    { background: #0c2233; border: 1px solid var(--accent2); color: var(--accent2); }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+  thead tr { background: var(--surface); }
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .badge-green { background: #052e16; color: var(--accent); }
+
+  .action-btns { display: flex; gap: 8px; }
+  .btn-sm { padding: 5px 12px; font-size: 0.72rem; border-radius: 4px; }
+
+  /* ── Search bar ── */
+  .search-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    align-items: flex-end;
+  }
+  .search-bar .field { flex: 1; }
+
+  /* ── Delete/Update sections ── */
+  .lookup-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .result-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 18px 0;
+    display: none;
+  }
+  .result-card.show { display: block; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
+  .info-row { display: flex; gap: 8px; align-items: center; }
+  .info-key { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); min-width: 110px; }
+  .info-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.88rem; color: var(--text); }
+
+  .edit-inline { display: none; margin-top: 20px; }
+  .edit-inline.show { display: block; }
+
+  /* ── Empty state ── */
+  .empty {
+    text-align: center;
+    padding: 50px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+  }
+  .empty .ico { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
+
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid .full { grid-column: 1; }
+    header, .tabs, .section { padding-left: 18px; padding-right: 18px; }
+    .tabs { overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">&#9670; StudentDB</span>
+  <span class="tagline">PHP CRUD · Registration System</span>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('insert')">① Insert</button>
+  <button class="tab-btn" onclick="switchTab('delete')">② Delete</button>
+  <button class="tab-btn" onclick="switchTab('update')">③ Update</button>
+  <button class="tab-btn" onclick="switchTab('view')">④ View Records</button>
+</div>
+
+<!-- ═══════════════════════════ INSERT ═══════════════════════════ -->
+<div id="tab-insert" class="section active">
+  <h2>Insert Student Record</h2>
+  <div id="ins-alert" class="alert"></div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:28px;">
+    <div class="form-grid">
+      <div class="field">
+        <label>First Name</label>
+        <input type="text" id="ins-fname" placeholder="e.g. Rahul">
+      </div>
+      <div class="field">
+        <label>Last Name</label>
+        <input type="text" id="ins-lname" placeholder="e.g. Sharma">
+      </div>
+      <div class="field">
+        <label>Roll No / ID</label>
+        <input type="text" id="ins-roll" placeholder="e.g. CS2024001">
+      </div>
+      <div class="field">
+        <label>Contact Number</label>
+        <input type="tel" id="ins-contact" placeholder="e.g. 9876543210">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="ins-pass" placeholder="Min 6 characters">
+      </div>
+      <div class="field">
+        <label>Confirm Password</label>
+        <input type="password" id="ins-cpass" placeholder="Re-enter password">
+      </div>
+      <div class="full" style="display:flex;gap:12px;margin-top:6px;">
+        <button class="btn btn-green" onclick="insertStudent()">Insert Record</button>
+        <button class="btn btn-ghost" onclick="clearInsertForm()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHP equivalent comment -->
+  <div style="margin-top:28px;background:#0a0c12;border:1px solid var(--border);border-radius:8px;padding:18px 22px;">
+    <div style="font-size:0.7rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">PHP Equivalent</div>
+    <pre style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:#94a3b8;overflow-x:auto;"><span style="color:#4ade80">$sql</span> = <span style="color:#fbbf24">"INSERT INTO students
+  (first_name, last_name, roll_no, password, contact)
+  VALUES (?, ?, ?, MD5(?), ?)"</span>;
+<span style="color:#38bdf8">$stmt</span> = <span style="color:#4ade80">$conn</span>->prepare(<span style="color:#38bdf8">$sql</span>);
+<span style="color:#38bdf8">$stmt</span>->bind_param(<span style="color:#fbbf24">"sssss"</span>, <span style="color:#4ade80">$fn</span>, <span style="color:#4ade80">$ln</span>, <span style="color:#4ade80">$roll</span>, <span style="color:#4ade80">$pass</span>, <span style="color:#4ade80">$contact</span>);
+<span style="color:#38bdf8">$stmt</span>->execute();</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ DELETE ═══════════════════════════ -->
+<div id="tab-delete" class="section">
+  <h2>Delete Student Record</h2>
+  <div id="del-alert" class="alert"></div>
+
+  <div class="lookup-card">
+    <div class="search-bar">
+      <div class="field">
+        <label>Enter Roll No / ID to Search</label>
+        <input type="text" id="del-roll" placeholder="e.g. CS2024001">
+      </div>
+      <button class="btn btn-blue" onclick="searchForDelete()">Search</button>
+    </div>
+
+    <div id="del-result" class="result-card">
+      <div style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;">Student Found</div>
+      <div class="info-grid" id="del-info"></div>
+      <div style="margin-top:20px;display:flex;gap:12px;">
+        <button class="btn btn-red" onclick="deleteStudent()">Delete Record</button>
+        <button class="btn btn-ghost" onclick="clearDelSearch()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:8px;background:#0a0c12;border:1px solid var(--border);border-radius:8px;padding:18px 22px;">
+    <div style="font-size:0.7rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">PHP Equivalent</div>
+    <pre style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:#94a3b8;overflow-x:auto;"><span style="color:#4ade80">$sql</span> = <span style="color:#fbbf24">"DELETE FROM students WHERE roll_no = ?"</span>;
+<span style="color:#38bdf8">$stmt</span> = <span style="color:#4ade80">$conn</span>->prepare(<span style="color:#38bdf8">$sql</span>);
+<span style="color:#38bdf8">$stmt</span>->bind_param(<span style="color:#fbbf24">"s"</span>, <span style="color:#4ade80">$roll_no</span>);
+<span style="color:#38bdf8">$stmt</span>->execute();</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ UPDATE ═══════════════════════════ -->
+<div id="tab-update" class="section">
+  <h2>Update Student Record</h2>
+  <div id="upd-alert" class="alert"></div>
+
+  <div class="lookup-card">
+    <div class="search-bar">
+      <div class="field">
+        <label>Enter Roll No / ID to Search</label>
+        <input type="text" id="upd-roll" placeholder="e.g. CS2024001">
+      </div>
+      <button class="btn btn-blue" onclick="searchForUpdate()">Search</button>
+    </div>
+
+    <div id="upd-result" class="result-card">
+      <div style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;">Edit Student Details</div>
+      <div class="form-grid" id="upd-form-fields">
+        <div class="field">
+          <label>First Name</label>
+          <input type="text" id="upd-fname">
+        </div>
+        <div class="field">
+          <label>Last Name</label>
+          <input type="text" id="upd-lname">
+        </div>
+        <div class="field full">
+          <label>Contact Number</label>
+          <input type="tel" id="upd-contact">
+        </div>
+        <div class="field">
+          <label>New Password <span style="color:var(--muted);font-size:0.65rem;">(leave blank to keep)</span></label>
+          <input type="password" id="upd-pass" placeholder="New password">
+        </div>
+        <div class="field">
+          <label>Confirm New Password</label>
+          <input type="password" id="upd-cpass" placeholder="Confirm new password">
+        </div>
+        <div class="full" style="display:flex;gap:12px;margin-top:6px;">
+          <button class="btn btn-warn" onclick="updateStudent()">Update Record</button>
+          <button class="btn btn-ghost" onclick="clearUpdSearch()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:8px;background:#0a0c12;border:1px solid var(--border);border-radius:8px;padding:18px 22px;">
+    <div style="font-size:0.7rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">PHP Equivalent</div>
+    <pre style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:#94a3b8;overflow-x:auto;"><span style="color:#4ade80">$sql</span> = <span style="color:#fbbf24">"UPDATE students
+  SET first_name=?, last_name=?, contact=?
+  WHERE roll_no=?"</span>;
+<span style="color:#38bdf8">$stmt</span> = <span style="color:#4ade80">$conn</span>->prepare(<span style="color:#38bdf8">$sql</span>);
+<span style="color:#38bdf8">$stmt</span>->bind_param(<span style="color:#fbbf24">"ssss"</span>, <span style="color:#4ade80">$fn</span>, <span style="color:#4ade80">$ln</span>, <span style="color:#4ade80">$contact</span>, <span style="color:#4ade80">$roll</span>);
+<span style="color:#38bdf8">$stmt</span>->execute();</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ VIEW ═══════════════════════════ -->
+<div id="tab-view" class="section">
+  <h2>View All Student Records</h2>
+  <div style="display:flex;gap:12px;margin-bottom:22px;align-items:center;flex-wrap:wrap;">
+    <input type="text" id="search-filter" placeholder="Filter by name or roll no…" oninput="renderTable()" style="max-width:300px;padding:9px 14px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:0.85rem;outline:none;">
+    <span id="rec-count" style="font-size:0.78rem;color:var(--muted);margin-left:auto;letter-spacing:1px;"></span>
+  </div>
+  <div class="table-wrap">
+    <table id="student-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Roll No / ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Contact</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:24px;background:#0a0c12;border:1px solid var(--border);border-radius:8px;padding:18px 22px;">
+    <div style="font-size:0.7rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">PHP Equivalent</div>
+    <pre style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:#94a3b8;overflow-x:auto;"><span style="color:#4ade80">$sql</span> = <span style="color:#fbbf24">"SELECT * FROM students ORDER BY roll_no"</span>;
+<span style="color:#38bdf8">$result</span> = <span style="color:#4ade80">$conn</span>->query(<span style="color:#38bdf8">$sql</span>);
+<span style="color:#f87171">while</span> (<span style="color:#4ade80">$row</span> = <span style="color:#38bdf8">$result</span>->fetch_assoc()) {
+  <span style="color:#f87171">echo</span> <span style="color:#fbbf24">"&lt;tr&gt;&lt;td&gt;"</span> . <span style="color:#4ade80">$row</span>[<span style="color:#fbbf24">'roll_no'</span>] . <span style="color:#fbbf24">"&lt;/td&gt;...&lt;/tr&gt;"</span>;
+}</pre>
+  </div>
+</div>
+
+<script>
+// ─── In-memory DB (replaces MySQL in this demo) ───────────────────────────
+let students = [
+  { roll: 'CS2024001', fname: 'Rahul',   lname: 'Sharma',  contact: '9876543210', pass: 'pass123' },
+  { roll: 'CS2024002', fname: 'Priya',   lname: 'Patel',   contact: '8765432109', pass: 'pass456' },
+  { roll: 'CS2024003', fname: 'Arjun',   lname: 'Mehta',   contact: '7654321098', pass: 'pass789' },
+];
+
+// ─── Tab switching ────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'view') renderTable();
+}
+
+// ─── Alert helper ─────────────────────────────────────────────────────────
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.className = 'alert alert-' + type + ' show';
+  el.textContent = msg;
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// ─── INSERT ───────────────────────────────────────────────────────────────
+function insertStudent() {
+  const fn      = document.getElementById('ins-fname').value.trim();
+  const ln      = document.getElementById('ins-lname').value.trim();
+  const roll    = document.getElementById('ins-roll').value.trim().toUpperCase();
+  const contact = document.getElementById('ins-contact').value.trim();
+  const pass    = document.getElementById('ins-pass').value;
+  const cpass   = document.getElementById('ins-cpass').value;
+
+  if (!fn || !ln || !roll || !contact || !pass || !cpass)
+    return showAlert('ins-alert', '⚠ All fields are required.', 'error');
+  if (pass !== cpass)
+    return showAlert('ins-alert', '⚠ Passwords do not match.', 'error');
+  if (pass.length < 6)
+    return showAlert('ins-alert', '⚠ Password must be at least 6 characters.', 'error');
+  if (!/^\d{10}$/.test(contact))
+    return showAlert('ins-alert', '⚠ Contact must be a 10-digit number.', 'error');
+  if (students.find(s => s.roll === roll))
+    return showAlert('ins-alert', '⚠ Roll No already exists.', 'error');
+
+  students.push({ roll, fname: fn, lname: ln, contact, pass });
+  clearInsertForm();
+  showAlert('ins-alert', '✔ Student record inserted successfully!', 'success');
+}
+function clearInsertForm() {
+  ['ins-fname','ins-lname','ins-roll','ins-contact','ins-pass','ins-cpass'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+// ─── DELETE ───────────────────────────────────────────────────────────────
+let delTarget = null;
+function searchForDelete() {
+  const roll = document.getElementById('del-roll').value.trim().toUpperCase();
+  const s = students.find(x => x.roll === roll);
+  if (!s) {
+    document.getElementById('del-result').classList.remove('show');
+    return showAlert('del-alert', '✘ No student found with Roll No: ' + roll, 'error');
+  }
+  delTarget = roll;
+  document.getElementById('del-info').innerHTML = infoGrid(s);
+  document.getElementById('del-result').classList.add('show');
+}
+function deleteStudent() {
+  students = students.filter(s => s.roll !== delTarget);
+  document.getElementById('del-result').classList.remove('show');
+  document.getElementById('del-roll').value = '';
+  delTarget = null;
+  showAlert('del-alert', '✔ Student record deleted successfully.', 'success');
+}
+function clearDelSearch() {
+  document.getElementById('del-result').classList.remove('show');
+  document.getElementById('del-roll').value = '';
+  delTarget = null;
+}
+
+// ─── UPDATE ───────────────────────────────────────────────────────────────
+let updTarget = null;
+function searchForUpdate() {
+  const roll = document.getElementById('upd-roll').value.trim().toUpperCase();
+  const s = students.find(x => x.roll === roll);
+  if (!s) {
+    document.getElementById('upd-result').classList.remove('show');
+    return showAlert('upd-alert', '✘ No student found with Roll No: ' + roll, 'error');
+  }
+  updTarget = roll;
+  document.getElementById('upd-fname').value   = s.fname;
+  document.getElementById('upd-lname').value   = s.lname;
+  document.getElementById('upd-contact').value = s.contact;
+  document.getElementById('upd-pass').value    = '';
+  document.getElementById('upd-cpass').value   = '';
+  document.getElementById('upd-result').classList.add('show');
+}
+function updateStudent() {
+  const fn      = document.getElementById('upd-fname').value.trim();
+  const ln      = document.getElementById('upd-lname').value.trim();
+  const contact = document.getElementById('upd-contact').value.trim();
+  const pass    = document.getElementById('upd-pass').value;
+  const cpass   = document.getElementById('upd-cpass').value;
+
+  if (!fn || !ln || !contact)
+    return showAlert('upd-alert', '⚠ Name and contact are required.', 'error');
+  if (!/^\d{10}$/.test(contact))
+    return showAlert('upd-alert', '⚠ Contact must be a 10-digit number.', 'error');
+  if (pass && pass !== cpass)
+    return showAlert('upd-alert', '⚠ Passwords do not match.', 'error');
+  if (pass && pass.length < 6)
+    return showAlert('upd-alert', '⚠ Password must be at least 6 characters.', 'error');
+
+  const idx = students.findIndex(s => s.roll === updTarget);
+  students[idx].fname   = fn;
+  students[idx].lname   = ln;
+  students[idx].contact = contact;
+  if (pass) students[idx].pass = pass;
+
+  document.getElementById('upd-result').classList.remove('show');
+  document.getElementById('upd-roll').value = '';
+  updTarget = null;
+  showAlert('upd-alert', '✔ Student record updated successfully.', 'success');
+}
+function clearUpdSearch() {
+  document.getElementById('upd-result').classList.remove('show');
+  document.getElementById('upd-roll').value = '';
+  updTarget = null;
+}
+
+// ─── VIEW TABLE ───────────────────────────────────────────────────────────
+function renderTable() {
+  const q = (document.getElementById('search-filter').value || '').toLowerCase();
+  const filtered = students.filter(s =>
+    s.roll.toLowerCase().includes(q) ||
+    s.fname.toLowerCase().includes(q) ||
+    s.lname.toLowerCase().includes(q)
+  );
+
+  document.getElementById('rec-count').textContent =
+    filtered.length + ' of ' + students.length + ' records';
+
+  const tbody = document.getElementById('table-body');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="ico">📭</div>No records found.</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map((s, i) => `
+    <tr>
+      <td style="color:var(--muted)">${i + 1}</td>
+      <td><span style="color:var(--accent2)">${s.roll}</span></td>
+      <td>${s.fname}</td>
+      <td>${s.lname}</td>
+      <td>${s.contact}</td>
+      <td><span class="badge badge-green">Active</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-warn btn-sm" onclick="quickEdit('${s.roll}')">Edit</button>
+          <button class="btn btn-red btn-sm" onclick="quickDelete('${s.roll}')">Delete</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function quickEdit(roll) {
+  switchTabDirect('update');
+  document.getElementById('upd-roll').value = roll;
+  searchForUpdate();
+}
+function quickDelete(roll) {
+  if (confirm('Delete student with Roll No: ' + roll + '?')) {
+    students = students.filter(s => s.roll !== roll);
+    renderTable();
+  }
+}
+function switchTabDirect(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn')[2].classList.add('active'); // Update tab
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
+function infoGrid(s) {
+  const rows = [
+    ['Roll No / ID', s.roll],
+    ['First Name',   s.fname],
+    ['Last Name',    s.lname],
+    ['Contact',      s.contact],
+  ];
+  return rows.map(([k,v]) => `
+    <div class="info-row">
+      <span class="info-key">${k}</span>
+      <span class="info-val">${v}</span>
+    </div>`).join('');
+}
+
+// Initial render
+renderTable();
+</script>
+</body>
+</html>
